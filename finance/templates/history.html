@@ -27,6 +27,12 @@
                             <td class="text-end">{{ history_data.shares }}</td>
                             <td class="text-end">{{ history_data.price }}</td>
                             <td class="text-end">{{ history_data.transaction_time}} </td>
+                            <td style="width:20px">
+                                <form action="/delete" method="post">
+                                    <input name="transactionId" type="hidden" value="{{ history_data.id }}">
+                                    <button type="submit">delete</button>
+                                </form>
+                            </td>
                         </tr>
                     {% elif history_data.transaction_type == "sell" %}
                         <tr class="table-danger">
@@ -35,6 +41,12 @@
                             <td class="text-end">{{ history_data.shares }}</td>
                             <td class="text-end">{{ history_data.price }}</td>
                             <td class="text-end">{{ history_data.transaction_time}} </td>
+                            <td style="width:20px">
+                                <form action="/delete" method="post">
+                                    <input name="transactionId" type="hidden" value="{{ history_data.id }}">
+                                    <button type="submit">delete</button>
+                                </form>
+                            </td>
                         </tr>
                     {% endif %}
                 {% endfor %}
@@ -59,12 +71,24 @@
                             <td class="text-start"> {{cashHistory.transactionType}} </td>
                             <td class="text-end"> {{cashHistory.amount}} </td>
                             <td class="text-end"> {{cashHistory.transaction_time}} </td>
+                            <td style="width:20px">
+                                <form action="/delete" method="post">
+                                    <input name="cashId" type="hidden" value="{{ cashHistory.id }}">
+                                    <button type="submit">delete</button>
+                                </form>
+                            </td>
                         </tr>
                     {% elif cashHistory.transactionType == "Deposit" %}
                         <tr class="table-success">
                             <td class="text-start"> {{cashHistory.transactionType}} </td>
                             <td class="text-end"> {{cashHistory.amount}} </td>
                             <td class="text-end"> {{cashHistory.transaction_time}} </td>
+                            <td style="width:20px">
+                                <form action="/delete" method="post">
+                                    <input name="cashId" type="hidden" value="{{ cashHistory.id }}">
+                                    <button type="submit">delete</button>
+                                </form>
+                            </td>
                         </tr>
                     {% endif %}
                 {% endfor %}

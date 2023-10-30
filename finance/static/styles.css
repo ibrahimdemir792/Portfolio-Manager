@@ -27,6 +27,9 @@ nav .navbar-brand .green
     width: 200px;
 }
 
-
+.center {
+    margin: auto;
+    width: 10%;
+  }
 
 

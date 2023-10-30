@@ -255,7 +255,24 @@ def cash():
 @app.route("/profileSettings", methods=["GET", "POST"])
 @login_required
 def profileSettings():
-    if request.method == "GET":
-        return render_template("profileSettings.html")
+    user_id = session.get("user_id")
+    if request.method == "GET": 
+        username = db.execute("SELECT * FROM users WHERE id = ?", user_id)
+        return render_template("profileSettings.html", username=username)
     elif request.method == "POST":
-        return render_template("profileSettings.html")
+        newusername = request.form.get("newusername")
+        db.execute("UPDATE users SET username = ? WHERE id = ?", newusername, user_id)
+        return redirect("/profileSettings")
+
+
+@app.route("/delete", methods=["POST"])
+def delete():
+    transactionId = request.form.get("transactionId")
+    cashId = request.form.get("cashId")
+    if transactionId:
+        db.execute("DELETE FROM transactions WHERE id = ?", transactionId)
+        flash("Transaction History Deleted")
+    elif cashId:
+        db.execute("DELETE FROM cashHistory WHERE id = ?", cashId)
+        flash("Cash History Deleted")
+    return redirect("/history")
