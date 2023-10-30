@@ -1,0 +1,88 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Portfolio
+{% endblock %}
+
+{% block main %}
+    <main class="container py-5 text-center">
+        <table id="sortable-table" class="table table-hover">
+
+            <thead>
+                <tr>
+                    <th class="text-start">Symbol</th>
+                    <th class="text-start">Name</th>
+                    <th class="text-end">Shares</th>
+                    <th class="text-end">Price</th>
+                    <th class="text-end">TOTAL</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% set sum = 0 %}
+                {% for stocks_data in stocks_data %}
+
+                <!--Insert Stock Charts-->
+                <div id="myDiv{{ loop.index }}" style="display: none;">
+                    {{ stocks_data.name }} Chart will be placed here
+                </div>
+
+                <tr>
+                    <td class="text-start">
+                        <a href="#" class="toggleButton" data-toggle-id="myDiv{{ loop.index }}">
+                            {{ stocks_data.name }}
+                        </a>
+                    </td>
+                    <td class="text-start">{{ stocks_data.symbol }}</td>
+                    <td class="text-end">{{ stocks_data.shares }}</td>
+                    <td class="text-end">{{ stocks_data.current_price }}</td>
+                    <td class="text-end">{{ (stocks_data.current_price * stocks_data.shares) | round(2) }} </td>
+                </tr>
+
+                {% set sum = sum + stocks_data.current_price * stocks_data.shares %}
+                {% endfor %}
+            </tbody>
+
+            <tfoot class="table table-striped">
+                <tr>
+
+                    <td class="border-0 fw-bold text-end" colspan="4">Cash</td>
+                    <td class="border-0 text-end">${{users[0].cash | round(2)}}</td>
+                </tr>
+                <tr>
+                    <td class="border-0 fw-bold text-end" colspan="4">TOTAL</td>
+                    <td class="border-0 w-bold text-end">${{( total + users[0].cash) | round(2)}}</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <!-- Deposit or Withdraw Cash Window-->
+        <div class="row">
+            <div class="col">
+                <button id="cashButton" class="btn btn-primary left">Cash Deposit/Withdraw</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div id="cashDiv" style="display: none;">
+                    <form id="cashform" action="/cash" method="post">
+                        <div class="form-group">
+                            <select id="transactionType" name="transactionType" class="form-control" style="width: auto; margin: auto">
+                                <option disabled selected>Select Transaction</option>
+                                <option value="Deposit">Deposit</option>
+                                <option value="Withdraw">Withdraw</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input class="form-control mx-auto w-auto m-2" name="amount" placeholder="Amount" autofocus required type="number" step="any">
+                        </div>
+                        <div class="form-group">
+                            <input id="submitButton" class="btn btn-primary" type="submit"></input>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </main>
+{% endblock %}

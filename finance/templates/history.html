@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    History
+{% endblock %}
+
+{% block main %}
+    <main class="container py-5 text-center">
+        <h2>Transaction History</h2>
+        <table id="sortable-table" class="table table-dark table-hover">
+            <thead>
+                <tr>
+                    <th class="text-start">Name</th>
+                    <th class="text-start">Buy/Sell</th>
+                    <th class="text-end" >Shares</th>
+                    <th class="text-end">Price</th>
+                    <th class="text-end">Transacted</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for history_data in history_data %}
+                    {% if history_data.transaction_type == "buy" %}
+                        <tr class="table-success">
+                            <td class="text-start">{{ history_data.name }}</td>
+                            <td class="text-start">{{ history_data.transaction_type }}</td>
+                            <td class="text-end">{{ history_data.shares }}</td>
+                            <td class="text-end">{{ history_data.price }}</td>
+                            <td class="text-end">{{ history_data.transaction_time}} </td>
+                        </tr>
+                    {% elif history_data.transaction_type == "sell" %}
+                    <tr class="table-danger">
+                        <td class="text-start">{{ history_data.name }}</td>
+                        <td class="text-start">{{ history_data.transaction_type }}</td>
+                        <td class="text-end">{{ history_data.shares }}</td>
+                        <td class="text-end">{{ history_data.price }}</td>
+                        <td class="text-end">{{ history_data.transaction_time}} </td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+        <h2>Cash History</h2>
+
+        <table id="sortable-table" class="table table-dark table-hover">
+            <thead>
+                <tr>
+                    <th class="text-start">Transaction</th>
+                    <th class="text-end">Amount</th>
+                    <th class="text-end">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cashHistory in cashHistory %}
+                    {% if cashHistory.transactionType == "Withdraw" %}
+                        <tr class="table-danger">
+                            <td class="text-start"> {{cashHistory.transactionType}} </td>
+                            <td class="text-end"> {{cashHistory.amount}} </td>
+                            <td class="text-end"> {{cashHistory.transaction_time}} </td>
+                        </tr>
+                    {% elif cashHistory.transactionType == "Deposit" %}
+                        <tr class="table-success">
+                            <td class="text-start"> {{cashHistory.transactionType}} </td>
+                            <td class="text-end"> {{cashHistory.amount}} </td>
+                            <td class="text-end"> {{cashHistory.transaction_time}} </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+{% endblock %}
