@@ -29,13 +29,13 @@
                             <td class="text-end">{{ history_data.transaction_time}} </td>
                         </tr>
                     {% elif history_data.transaction_type == "sell" %}
-                    <tr class="table-danger">
-                        <td class="text-start">{{ history_data.name }}</td>
-                        <td class="text-start">{{ history_data.transaction_type }}</td>
-                        <td class="text-end">{{ history_data.shares }}</td>
-                        <td class="text-end">{{ history_data.price }}</td>
-                        <td class="text-end">{{ history_data.transaction_time}} </td>
-                    </tr>
+                        <tr class="table-danger">
+                            <td class="text-start">{{ history_data.name }}</td>
+                            <td class="text-start">{{ history_data.transaction_type }}</td>
+                            <td class="text-end">{{ history_data.shares }}</td>
+                            <td class="text-end">{{ history_data.price }}</td>
+                            <td class="text-end">{{ history_data.transaction_time}} </td>
+                        </tr>
                     {% endif %}
                 {% endfor %}
             </tbody>

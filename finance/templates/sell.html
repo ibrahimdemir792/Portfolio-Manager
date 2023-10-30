@@ -7,11 +7,15 @@
 {% block main %}
     <form action="/sell" method="post">
         <div class="mb-3">
-            <select class="form-select mx-auto w-auto" name="symbol">
+            <select class="form-select mx-auto w-auto" name="symbol" id="symbol-select">
+                <option value="" selected disabled> Select Symbol to Sell</option>
                 {% for stocks in stocks %}
-                    <option value="{{stocks.symbol}}">{{stocks.symbol}}</option>
+                    <option value="{{stocks.symbol}}" data-shares="{{ stocks.shares }}" data-name="{{ stocks.name }}">{{stocks.name}}</option>
                 {% endfor %}
             </select>
+        </div>
+        <div class="mb-3" id="shares-info" style="display: none;">
+            You have  <span id="shares-number"></span> shares of <span id="share-name"></span>
         </div>
         <div class="mb-3">
             <input autocomplete="off" class="form-control mx-auto w-auto" min="1" max="{{stocks.shares}}" name="shares" placeholder="Shares" required type="number">

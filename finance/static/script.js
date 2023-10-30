@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // Check the page title to determine which page you are on
+    const pageTitle = document.title;
+    
     // Toggle Dark Mode
     var themeToggle = document.getElementById("mySwitch");
     var htmlElement = document.querySelector("html");
@@ -28,13 +31,28 @@ document.addEventListener("DOMContentLoaded", function () {
         htmlElement.setAttribute("data-bs-theme", "light");
     };
 
+    if(pageTitle.includes("Portfolio")) {
+        // To Show/Hide Charts Div
+        const toggleButtons = document.querySelectorAll(".toggleButton");
+        toggleButtons.forEach(function (button) {
+            button.addEventListener("click", function () {
+                const toggleId = button.getAttribute("data-toggle-id");
+                const div = document.getElementById(toggleId);
+                if (div.style.display === "none")
+                {
+                    div.style.display = "block";
+                }
+                else
+                {
+                    div.style.display = "none";
+                }
+            })
+        });
+    
 
-    // To Show/Hide Charts Div
-    const toggleButtons = document.querySelectorAll(".toggleButton");
-    toggleButtons.forEach(function (button) {
-        button.addEventListener("click", function () {
-            const toggleId = button.getAttribute("data-toggle-id");
-            const div = document.getElementById(toggleId);
+        // Show/Hide Deposit/Withdraw Cash Window
+        document.querySelector("#cashButton").onclick = function() {
+            var div = document.getElementById("cashDiv");
             if (div.style.display === "none")
             {
                 div.style.display = "block";
@@ -43,81 +61,86 @@ document.addEventListener("DOMContentLoaded", function () {
             {
                 div.style.display = "none";
             }
-        })
-    });
+        };
 
 
-    // Show/Hide Deposit/Withdraw Cash Window
-    document.querySelector("#cashButton").onclick = function() {
-        var div = document.getElementById("cashDiv");
-        if (div.style.display === "none")
-        {
-            div.style.display = "block";
-        }
-        else
-        {
-            div.style.display = "none";
-        }
-    };
+        // Dynamicly Change the Deposit or Withdraw Button
+        const transactionType = document.getElementById("transactionType");
+        const submitButton = document.getElementById("submitButton");
 
-
-    // Dynamicly Change the Deposit or Withdraw Button
-    const transactionType = document.getElementById("transactionType");
-    const submitButton = document.getElementById("submitButton");
-
-    transactionType.addEventListener("change", function() {
-        if (transactionType.value === "Deposit")
-        {
-            submitButton.value = "Deposit";
-        }
-        else if (transactionType.value === "Withdraw")
-        {
-            submitButton.value = "Withdraw";
-        }
-    });
-
-
-    // Prevent Submiting without Selecting Deposit/Withdraw Option
-    document.getElementById("cashform").addEventListener("submit", function(event) {
-        // Prevent the form from being submitted by default
-        event.preventDefault();
-        // Get the selected option from the select menu
-        var selectedOption = document.getElementById("transactionType").value;
-        // Check if an option has been selected
-        if (selectedOption == "Select Transaction")
-        {
-            alert("Select Transaction Type");
-        }
-        else
-        {
-            this.submit();
-        }
-    });
-
-
-    // Initalize DataTables for Sorting
-    $(document).ready(function() {
-        $('#sortable-table').DataTable({
-            paging: false
-        });
-    });
-
-
-    // Toggle Between Stock Details
-    document.getElementById("properties").addEventListener("change", function() {
-        var selectedOption = this.value;
-        var propertyDetailsDivs = document.querySelectorAll(".property-details");
-
-        propertyDetailsDivs.forEach(function(div) {
-            if (div.id === selectedOption) {
-                div.style.display = "block";
-            } else {
-                div.style.display = "none";
+        transactionType.addEventListener("change", function() {
+            if (transactionType.value === "Deposit")
+            {
+                submitButton.value = "Deposit";
+            }
+            else if (transactionType.value === "Withdraw")
+            {
+                submitButton.value = "Withdraw";
             }
         });
-    });
 
 
+        // Prevent Submiting without Selecting Deposit/Withdraw Option
+        document.getElementById("cashform").addEventListener("submit", function(event) {
+            // Prevent the form from being submitted by default
+            event.preventDefault();
+            // Get the selected option from the select menu
+            var selectedOption = document.getElementById("transactionType").value;
+            // Check if an option has been selected
+            if (selectedOption == "Select Transaction")
+            {
+                alert("Select Transaction Type");
+            }
+            else
+            {
+                this.submit();
+            }
+        });
+
+
+        // Initalize DataTables for Sorting
+        $(document).ready(function() {
+            $('#sortable-table').DataTable({
+                paging: false
+            });
+        });
+    }
+
+
+    if(pageTitle.includes("Quote")) {
+        // Toggle Between Stock Details
+        document.getElementById("properties").addEventListener("change", function() {
+            var selectedOption = this.value;
+            var propertyDetailsDivs = document.querySelectorAll(".property-details");
+
+            propertyDetailsDivs.forEach(function(div) {
+                if (div.id === selectedOption) {
+                    div.style.display = "block";
+                } else {
+                    div.style.display = "none";
+                }
+            });
+        });
+    }
+
+
+    if(pageTitle.includes("Sell")) {
+        // Show share count on sell page
+        const symbolSelect = document.getElementById("symbol-select");
+        const sharesInfoDiv = document.getElementById("shares-info");
+        const sharesCountSpan = document.getElementById("shares-number");
+        const shareNameSpan = document.getElementById("share-name");
+        
+        symbolSelect.addEventListener("change", function() {
+            const selectedOption = symbolSelect.options[symbolSelect.selectedIndex];
+            const selectedShares = selectedOption.getAttribute("data-shares");
+            const selectedName = selectedOption.getAttribute("data-name");
+
+            sharesCountSpan.textContent = selectedShares;
+            shareNameSpan.textContent = selectedName;
+            sharesInfoDiv.style.display = "block";
+        });
+    }
 });
 
 
