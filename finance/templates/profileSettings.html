@@ -12,33 +12,64 @@
                 <input type="text" class="form-control" placeholder="{{ username[0]['username'] }}" disabled>
             </div>
             <div class="mt-2">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">Change username</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modalusername">Change username</button>
+            </div>
+            <div class="mt-2">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modalpassword">Change password</button>
             </div>
         </div>
     </div>
-    <!--Modal-->
-    <div class="modal" id="myModal">
+    <!-- Username Modal -->
+    <div class="modal" id="Modalusername">
         <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-      
-            <!-- Modal Header -->
-            <div class="modal-header">
-              <h4 class="modal-title">Change Username</h4>
-              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Change Username</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <form action="/profileSettings" method="post">
+                        <div>
+                            <input type="text" name="newusername" placeholder="New username">
+                        </div>
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-danger me-3" data-bs-dismiss="modal">Close</button>
+                            <input type="submit" class="btn btn-success" data-bs-dismiss="modal" value="Change">
+                        </div>
+                    </form>
+                </div>
             </div>
-      
-            <!-- Modal body -->
-            <div class="modal-body">
-                <form action="/profileSettings" method="post" >
-                    <div>
-                        <input type="text" name="newusername" placeholder="New username">
-                    </div>
-                    <div class="mt-2">
-                        <button type="button" class="btn btn-danger me-3" data-bs-dismiss="modal" >Close</button>
-                        <input type="submit" class="btn btn-success" data-bs-dismiss="modal" value="Change">
-                    </div>                    
-                </form>
-          </div>
         </div>
-      </div>
+    </div>
+
+    <!-- Password Modal -->
+    <div class="modal" id="Modalpassword">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Change Password</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <form action="/profileSettings" method="post">
+                        <div>
+                            <input class="form-control mx-auto w-auto m-1" autocomplete="off" type="password" name="oldpassword" required placeholder="Current password">
+                            <input class="form-control mx-auto w-auto m-1" autocomplete="off" type="password" name="newpassword" required placeholder="New password">
+                            <input class="form-control mx-auto w-auto m-1" autocomplete="off" type="password" name="newpasswordconfirmation" required placeholder="Confirmation">
+                        </div>
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-danger me-3" data-bs-dismiss="modal">Close</button>
+                            <input type="submit" class="btn btn-success" data-bs-dismiss="modal" value="Change">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 {% endblock %}

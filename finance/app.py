@@ -261,8 +261,23 @@ def profileSettings():
         return render_template("profileSettings.html", username=username)
     elif request.method == "POST":
         newusername = request.form.get("newusername")
-        db.execute("UPDATE users SET username = ? WHERE id = ?", newusername, user_id)
-        return redirect("/profileSettings")
+        oldpassword = request.form.get("oldpassword")
+        newpassword = request.form.get("newpassword")
+        newpasswordconfirmation = request.form.get("newpasswordconfirmation")
+        row = db.execute("SELECT * FROM users WHERE id = ?", user_id)
+        if newusername:
+            db.execute("UPDATE users SET username = ? WHERE id = ?", newusername, user_id)
+            return redirect("/profileSettings")
+        elif len(row) != 1 or not check_password_hash(row[0]["hash"],oldpassword):
+            return apology("Invalid current password")
+        elif newpassword != newpasswordconfirmation:
+            return apology("New Password and Confirmation Do Not Match")
+        elif newpassword == newpasswordconfirmation:
+            db.execute("UPDATE users SET hash = ? WHERE id = ?", generate_password_hash(newpassword, method='pbkdf2', salt_length=16), user_id)
+            flash("Password is successfully changed")
+            return redirect("/logout")
+        
+
 
 
 @app.route("/delete", methods=["POST"])
