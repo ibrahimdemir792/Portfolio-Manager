@@ -21,7 +21,10 @@ import json
 #print(fundamentals_data)
 #income
 
-balance = si.get_cash_flow("aapl")
-print(balance)
+#balance = si.get_cash_flow("aapl")
+#print(balance)
+
+stock = get_data("nvda")
+print(stock)
 
 
