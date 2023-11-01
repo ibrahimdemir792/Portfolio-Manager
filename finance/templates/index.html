@@ -13,7 +13,7 @@
                     <th class="text-start">Symbol</th>
                     <th class="text-start">Name</th>
                     <th class="text-end">Shares</th>
-                    <th class="text-end">Price</th>
+                    <th class="text-end">Current Price</th>
                     <th class="text-end">TOTAL</th>
                 </tr>
             </thead>
@@ -24,7 +24,7 @@
 
                 <!--Insert Stock Charts-->
                 <div id="myDiv{{ loop.index }}" style="display: none;">
-                    {{ stocks_data.name }} Chart will be placed here
+                    {{ stocks_data.name }} Monthly Chart 
                     <div id="chart- {{ stocks_data.name }}" style="width: 1200px; height: 400px;"></div>
                 </div>
                 
@@ -39,6 +39,14 @@
                     <td class="text-end">{{ stocks_data.shares }}</td>
                     <td class="text-end">{{ stocks_data.current_price }}</td>
                     <td class="text-end">{{ (stocks_data.current_price * stocks_data.shares) | round(2) }} </td>
+                    <td style="width:20px">
+                        <form action="/delete" method="post">
+                            <input name="stockId" type="hidden" value="{{ stocks_data.id }}">
+                            <button type="submit">
+                                <i class="fas fa-times" style="color: red;"></i>
+                            </button>
+                        </form>
+                    </td>
                 </tr>
 
                 {% set sum = sum + stocks_data.current_price * stocks_data.shares %}

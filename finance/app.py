@@ -50,11 +50,13 @@ def index():
     # Define a list to match stocks and current prices
     for stock in portfolio:
         symbol = stock["symbol"]
+        id = stock["id"]
         lookupValue = lookup(symbol)
         if lookupValue:
             current_price = lookupValue["price"]
             total += current_price * stock["shares"]
             stocks_data.append({
+                "id": id,
                 "symbol": symbol,
                 "name": stock["name"],
                 "shares": stock["shares"],
@@ -253,6 +255,7 @@ def cash():
             flash(f"{amount} Withdrawn", "primary")
     return redirect("/")
 
+
 @app.route("/profileSettings", methods=["GET", "POST"])
 @login_required
 def profileSettings():
@@ -261,42 +264,65 @@ def profileSettings():
         username = db.execute("SELECT * FROM users WHERE id = ?", user_id)
         return render_template("profileSettings.html", username=username)
     elif request.method == "POST":
+        row = db.execute("SELECT * FROM users WHERE id = ?", user_id)
+
+        # Change username
         newusername = request.form.get("newusername")
+        
+        # Change password
         oldpassword = request.form.get("oldpassword")
         newpassword = request.form.get("newpassword")
         newpasswordconfirmation = request.form.get("newpasswordconfirmation")
-        row = db.execute("SELECT * FROM users WHERE id = ?", user_id)
+        
+        # Delete account
+        deleteAccPassword = request.form.get("deleteAccPassword")
+        deleteAccConfirmation = request.form.get("deleteAccConfirmation")
+        
         if newusername:
             db.execute("UPDATE users SET username = ? WHERE id = ?", newusername, user_id)
             return redirect("/profileSettings")
-        elif len(row) != 1 or not check_password_hash(row[0]["hash"],oldpassword):
-            return apology("Invalid current password")
-        elif newpassword != newpasswordconfirmation:
-            return apology("New Password and Confirmation Do Not Match")
-        elif newpassword == newpasswordconfirmation:
-            db.execute("UPDATE users SET hash = ? WHERE id = ?", generate_password_hash(newpassword, method='pbkdf2', salt_length=16), user_id)
-            flash("Password is successfully changed")
-            return redirect("/logout")
+        elif oldpassword:
+            if len(row) != 1 or not check_password_hash(row[0]["hash"],oldpassword):
+                return apology("Invalid current password")
+            elif newpassword != newpasswordconfirmation:
+                return apology("New Password and Confirmation Do Not Match")
+            elif newpassword == newpasswordconfirmation:
+                db.execute("UPDATE users SET hash = ? WHERE id = ?", generate_password_hash(newpassword, method='pbkdf2', salt_length=16), user_id)
+                flash("Password is successfully changed")
+                return redirect("/logout")
+        elif deleteAccPassword:
+            if len(row) != 1 or not check_password_hash(row[0]["hash"],deleteAccPassword):
+                return apology("Invalid password")
+            elif deleteAccPassword != deleteAccConfirmation:
+                return apology("Password and Confirmation Do Not Match")
+            elif deleteAccPassword == deleteAccConfirmation:
+                db.execute("DELETE FROM cashHistory WHERE user_id = ?", user_id)
+                db.execute("DELETE FROM transactions WHERE user_id = ?", user_id)
+                db.execute("DELETE FROM portfolio WHERE user_id = ?", user_id)
+                db.execute("DELETE FROM users WHERE id = ?", user_id)
+                return redirect("/logout")
+        
         
 
 
 @app.route("/delete", methods=["POST"])
 def delete():
+    user_id = session.get("user_id")
     transactionId = request.form.get("transactionId")
     cashId = request.form.get("cashId")
+    stockId = request.form.get("stockId")
     if transactionId:
         db.execute("DELETE FROM transactions WHERE id = ?", transactionId)
         flash("Transaction History Deleted")
+        return redirect("/history")
     elif cashId:
         db.execute("DELETE FROM cashHistory WHERE id = ?", cashId)
         flash("Cash History Deleted")
-    return redirect("/history")
-
-
-@app.route("/chart", methods=["GET"])
-def chart():
-    return render_template("chart.html")
-
+        return redirect("/history")
+    elif stockId:
+        db.execute("DELETE FROM portfolio WHERE id = ?", stockId)
+        flash("Stock Deleted")
+        return redirect("/")
 
 
 
