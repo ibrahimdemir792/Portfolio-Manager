@@ -104,6 +104,59 @@ document.addEventListener("DOMContentLoaded", function () {
                 paging: false
             });
         });
+
+
+        // Add an event listener to handle stock name link clicks
+        const toggles = document.querySelectorAll(".toggleButton");
+        toggles.forEach(function (button) {
+            button.addEventListener("click", function () {
+                const symbol = button.getAttribute("data-symbol");
+                const chartName = button.getAttribute("data-chart-name");
+
+                // Fetch data for the selected stock
+                fetch(`/get_stock_data?symbol=${symbol}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Process the data and create the chart for the selected stock
+                        // Use chartName to display the stock name in the chart
+                        var chartId = `chart-${chartName}`;
+                        var chartDom = document.getElementById(chartId);
+                        if (chartDom) {
+                            const myChart = echarts.init(chartDom);
+                            // Process the data and create the chart
+                            const dataArray = data.data;
+                            const xAxisData = dataArray.map(item => {
+                                const date = new Date(item.index);
+                                return date.toLocaleDateString();   // Format as 'MM/DD/YYYY' or as needed
+                            });
+
+                            const yAxisData = dataArray.map(item => [item.open, item.close, item.low, item.high]);
+
+                            const option = {
+                                xAxis: {
+                                    data: xAxisData,
+                                },
+                                yAxis: {},
+                                series: [
+                                    {
+                                        type: 'candlestick',
+                                        data: yAxisData,
+                                    },
+                                ],
+                            };
+
+                            // Set the option and render the chart
+                            option && myChart.setOption(option);
+                        } else {
+                            console.error("Chart container not found:", chartId);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                    });
+            })
+        });
+
     }
 
 
@@ -141,6 +194,46 @@ document.addEventListener("DOMContentLoaded", function () {
             sharesInfoDiv.style.display = "block";
         });
     }
+
+    
+    if(pageTitle.includes("Chart")) {
+        var chartDom = document.getElementById('main');
+        var myChart = echarts.init(chartDom);
+        let option;
+
+        fetch(`/get_stock_data?symbol=AAPL`)
+            .then(response => response.json())
+            .then(data => {
+                // Process the data to format it for the chart
+                const dataArray = data.data;
+                const xAxisData = dataArray.map(item => {
+                    const date = new Date(item.index);
+                    return date.toLocaleDateString(); // Format as 'MM/DD/YYYY' or as needed
+                });
+
+                const yAxisData = dataArray.map(item => [item.open, item.close, item.low, item.high]);
+        
+                option = {
+                    xAxis: {
+                        data: xAxisData,
+                    },
+                    yAxis: {},
+                    series: [
+                        {
+                            type: 'candlestick',
+                            data: yAxisData,
+                        },
+                    ],
+                };
+        
+                // Set the option and render the chart
+                option && myChart.setOption(option);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+                
+    }
+    
+    
 });
-
-

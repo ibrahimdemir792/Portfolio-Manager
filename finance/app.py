@@ -1,7 +1,8 @@
 import os
+import json
 
 from cs50 import SQL
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import Flask, flash, redirect, render_template, request, session, jsonify
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -279,7 +280,6 @@ def profileSettings():
         
 
 
-
 @app.route("/delete", methods=["POST"])
 def delete():
     transactionId = request.form.get("transactionId")
@@ -291,3 +291,30 @@ def delete():
         db.execute("DELETE FROM cashHistory WHERE id = ?", cashId)
         flash("Cash History Deleted")
     return redirect("/history")
+
+
+@app.route("/chart", methods=["GET"])
+def chart():
+    return render_template("chart.html")
+
+
+
+
+# Define the get_stock_data function
+def get_stock_data(symbol):
+    try:
+        # Get stock data using yahoo_fin.stock_info
+        data = get_data(symbol, start_date="09/30/2023", end_date="10/30/2023", index_as_date = True, interval="1d")
+        
+        # Convert the DataFrame to JSON
+        json_data = data.to_json(orient='table')
+        return json_data
+
+    except Exception as e:
+        return str(e)
+    
+@app.route('/get_stock_data', methods=['GET', 'POST'])
+def fetch_stock_data():
+    symbol = request.args.get('symbol')
+    stock_data = get_stock_data(symbol)
+    return stock_data

@@ -25,11 +25,13 @@
                 <!--Insert Stock Charts-->
                 <div id="myDiv{{ loop.index }}" style="display: none;">
                     {{ stocks_data.name }} Chart will be placed here
+                    <div id="chart- {{ stocks_data.name }}" style="width: 1200px; height: 400px;"></div>
                 </div>
+                
 
                 <tr>
                     <td class="text-start">
-                        <a href="#" class="toggleButton" data-toggle-id="myDiv{{ loop.index }}">
+                        <a href="#" class="toggleButton" data-toggle-id="myDiv{{ loop.index }}" data-chart-name=" {{ stocks_data.name}}" data-symbol="{{ stocks_data.symbol }}">
                             {{ stocks_data.name }}
                         </a>
                     </td>
