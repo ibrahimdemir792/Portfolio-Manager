@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@amcharts/amcharts5": "^5.5.2",
-    "@amcharts/amcharts5-geodata": "^5.1.1"
-  }
-}
