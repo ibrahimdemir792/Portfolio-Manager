@@ -222,7 +222,7 @@ def sell():
             # Set new value for shares
             db.execute("UPDATE portfolio SET shares = ? WHERE user_id = ? AND symbol = ?", new_shares, row[0]["user_id"], symbol)
             # Add cash to the wallet
-            db.execute("UPDATE users SET cash = ? where id = ?", (rows[0]["cash"] + lookupValue["price"] * int(shares)), user_id)
+            db.execute("UPDATE users SET cash = ? WHERE id = ?", (rows[0]["cash"] + lookupValue["price"] * int(shares)), user_id)
             check_zero = db.execute("SELECT * FROM portfolio WHERE shares=0")
             # Add to transaction history
             db.execute("INSERT INTO transactions (user_id, symbol, shares, price, transaction_type, name) VALUES(?, ?, ?, ?, ?, ?)", user_id, symbol, shares, lookupValue["price"], "sell", lookupValue["name"])
@@ -307,7 +307,6 @@ def profileSettings():
 
 @app.route("/delete", methods=["POST"])
 def delete():
-    user_id = session.get("user_id")
     transactionId = request.form.get("transactionId")
     cashId = request.form.get("cashId")
     stockId = request.form.get("stockId")
@@ -324,6 +323,102 @@ def delete():
         flash("Stock Deleted")
         return redirect("/")
 
+
+@app.route("/edit", methods=["POST"])
+def edit():
+    # Get edit inputs from form
+    user_id = session.get("user_id")
+    editedShares = int(request.form.get("editShares"))
+    editedPrice = float(request.form.get("editPrice"))
+    editedTransactionId = int(request.form.get("editTransactionId"))
+
+    # Get tables to make changes
+    transaction = db.execute("SELECT * FROM transactions WHERE id = ? AND user_id = ?", editedTransactionId, user_id)
+    editedSymbol = transaction[0]["symbol"]
+    portfolio = db.execute("SELECT * FROM portfolio WHERE symbol = ? AND user_id = ?", editedSymbol, user_id)
+    userData = db.execute("SELECT * FROM users WHERE id = ?", user_id)
+    userWallet = userData[0]["cash"]
+
+    # Get current values for math
+    originalShares = transaction[0]["shares"]
+    originalPrice = transaction[0]["price"]
+    transactionType = transaction[0]["transaction_type"]
+
+    # Math
+    # Cash Calculation
+    transactionValueBefore = originalShares * originalPrice
+    transactionValueAfter = editedShares * editedPrice
+    cashChange = transactionValueBefore - transactionValueAfter
+    # Share count calculation
+    shareDifferenceAtTransaction = editedShares - originalShares
+
+    if transactionType == "buy":
+        if userWallet + cashChange < 0:
+            return apology("Not enough cash")
+        # Check the symbol still in portfolio or not
+        elif portfolio:
+            portfolioShares = portfolio[0]["shares"]
+            # Check is there enough shares in portfolio to decrease transaction shares
+            if portfolioShares + shareDifferenceAtTransaction < 0:
+                return apology("You can't have negative shares of stock")
+            else:
+                db.execute("UPDATE transactions SET shares = ? , price = ? WHERE id = ? AND user_id = ?", editedShares, editedPrice, editedTransactionId, user_id)
+                db.execute("UPDATE portfolio SET shares = ? WHERE symbol = ? AND user_id = ?", (portfolioShares + shareDifferenceAtTransaction), editedSymbol, user_id)
+                db.execute("UPDATE users SET cash = ? WHERE id = ?", (userWallet + cashChange), user_id)
+                flash("Transaction Edited")
+                # Remove shares from database if no remain
+                checkZeroShares = db.execute("SELECT * FROM portfolio WHERE shares=0")
+                if checkZeroShares:
+                    db.execute("DELETE FROM portfolio WHERE shares=0")
+                    return redirect("/history")
+                return redirect("history")
+        else:
+            if editedShares - originalShares < 0:
+                return apology("You can't have negative shares of stock")
+            else:
+                db.execute("UPDATE transactions SET shares = ? , price = ? WHERE id = ? AND user_id = ?", editedShares, editedPrice, editedTransactionId, user_id)
+                db.execute("INSERT INTO portfolio (user_id, symbol, name, shares) VALUES (?, ?, ?, ?)", user_id, editedSymbol, transaction[0]["name"], (editedShares - originalShares))
+                db.execute("UPDATE users SET cash = ? WHERE id = ?", (userWallet + cashChange), user_id)
+                flash("Transaction Edited")
+                checkZeroShares = db.execute("SELECT * FROM portfolio WHERE shares=0")
+                if checkZeroShares:
+                    db.execute("DELETE FROM portfolio WHERE shares=0")
+                    return redirect("/history")
+                return redirect("/history")
+            
+    elif transactionType == "sell":
+        # Check the symbol still in portfolio or not
+        if portfolio:
+            portfolioShares = portfolio[0]["shares"]
+            # Check is there enough shares in portfolio to sell more shares
+            if portfolioShares - shareDifferenceAtTransaction < 0:
+                return apology("You can't have negative shares of stock")
+            else:
+                db.execute("UPDATE transactions SET shares = ? , price = ? WHERE id = ? AND user_id = ?", editedShares, editedPrice, editedTransactionId, user_id)
+                db.execute("UPDATE portfolio SET shares = ? WHERE symbol = ? AND user_id = ?", (portfolioShares - shareDifferenceAtTransaction), editedSymbol, user_id)
+                db.execute("UPDATE users SET cash = ? WHERE id = ?", (userWallet - cashChange), user_id)
+                flash("Transaction Edited")
+                # Remove shares from database if no remain
+                checkZeroShares = db.execute("SELECT * FROM portfolio WHERE shares=0")
+                if checkZeroShares:
+                    db.execute("DELETE FROM portfolio WHERE shares=0")
+                    return redirect("/history")
+                return redirect("history")
+        else:
+            if editedShares > originalShares:
+                return apology("You can't have negative shares of stock")
+            else:
+                db.execute("UPDATE transactions SET shares = ? , price = ? WHERE id = ? AND user_id = ?", editedShares, editedPrice, editedTransactionId, user_id)
+                db.execute("INSERT INTO portfolio (user_id, symbol, name, shares) VALUES (?, ?, ?, ?)", user_id, editedSymbol, transaction[0]["name"], (originalShares - editedShares))
+                db.execute("UPDATE users SET cash = ? WHERE id = ?", (userWallet - cashChange), user_id)
+                flash("Transaction Edited")
+                checkZeroShares = db.execute("SELECT * FROM portfolio WHERE shares=0")
+                if checkZeroShares:
+                    db.execute("DELETE FROM portfolio WHERE shares=0")
+                    return redirect("/history")
+                return redirect("/history")
+
+            
 
 
 # Define the get_stock_data function

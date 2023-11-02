@@ -234,6 +234,16 @@ document.addEventListener("DOMContentLoaded", function () {
             });
                 
     }
+
+
+    if (pageTitle.includes("Profile Settings")) {
+        const checkbox = document.getElementById("checkbox");
+        const deleteAccButton = document.getElementById("deleteAccButton");
+        
+        checkbox.addEventListener("change", function () {
+            deleteAccButton.disabled = !checkbox.checked;
+        });        
+    }
     
     
 });
